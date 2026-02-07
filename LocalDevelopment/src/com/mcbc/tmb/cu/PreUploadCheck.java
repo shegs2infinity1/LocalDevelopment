@@ -43,15 +43,15 @@ public class PreUploadCheck extends ServiceLifecycle {
         DataAccess dataAccess = new DataAccess(this);
         EbCommonParamTmbRecord paramRecord = new EbCommonParamTmbRecord(
                 dataAccess.getRecord("EB.COMMON.PARAM.TMB", "AUTOMATIC.BILLING.PATH"));
-        System.out.println("In the select -------   " + paramRecord.toString());
+//        System.out.println("In the select -------   " + paramRecord.toString());
         for (ParamNameClass param : paramRecord.getParamName()) {
             if (param.getParamName().getValue().contains("AUTO.BILL.PATH")) {
                 BASE_PATH = param.getParamValue().get(0).getValue();
                 LOAD_DIR = BASE_PATH + "load";
-                PREUP_DIR = BASE_PATH + "preupload";
-                System.out.println("Base Path ------"+ BASE_PATH);
-                System.out.println("Load Path ------"+ LOAD_DIR);
-                System.out.println("Preup Path -----"+ PREUP_DIR);
+                PREUP_DIR = BASE_PATH + "preupload/";
+//                System.out.println("Base Path ------"+ BASE_PATH);
+//                System.out.println("Load Path ------"+ LOAD_DIR);
+//                System.out.println("Preup Path -----"+ PREUP_DIR);
                 break;
             }
         }
@@ -65,20 +65,20 @@ public class PreUploadCheck extends ServiceLifecycle {
         if (PreloadFolder.exists() && PreloadFolder.isDirectory()) {
             String[] filesCount = loadFolder.list();
             if (filesCount != null && filesCount.length > 0) {
-                System.out.println("The folder is not empty.");
+//                System.out.println("The folder is not empty.");
                 return fileNames;
             } else {
                 String[] prefilesCount = PreloadFolder.list();
                 if (prefilesCount != null && prefilesCount.length > 0) {
-                    System.out.println("The folder is not empty.");
+//                    System.out.println("The folder is not empty.");
                     File[] files = PreloadFolder.listFiles();
-                    System.out.println("List all Files---" + files.toString());
+//                    System.out.println("List all Files---" + files.toString());
                     File file = files[0];
                     String fileName = file.getName();
-                    System.out.println("Selected File---" + fileName);
+//                    System.out.println("Selected File---" + fileName);
                     FileToProcess.add(fileName);
                 } else {
-                    System.out.println("The folder is empty.");
+//                    System.out.println("The folder is empty.");
                 }
 
                 return FileToProcess;
@@ -91,16 +91,16 @@ public class PreUploadCheck extends ServiceLifecycle {
 
     // Veer start write file name to parameter table
     private void updateCommonParamRecord(EbCommonParamTmbRecord ebCommonParamTmbRecord, String fileName) {
-        System.out.println("updateCommonParamRecord");
+//        System.out.println("updateCommonParamRecord");
         for (ParamNameClass ParamName : ebCommonParamTmbRecord.getParamName()) {
-            System.out.println("entered the for loop:" + ParamName);
+//            System.out.println("entered the for loop:" + ParamName);
             if (ParamName.getParamName().getValue().contains("FILE.NAME")) {
-                System.out.println("get value contains fileName:" + fileName);
+//                System.out.println("get value contains fileName:" + fileName);
                 ParamName.getParamValue().get(0).setValue(fileName);
                 ParamName.setParamValue(fileName, 0);
-                System.out.println("set value contains fileName 0 :" + fileName);
+//                System.out.println("set value contains fileName 0 :" + fileName);
                 ebCommonParamTmbRecord.setParamName(ParamName, 0);
-                System.out.println("Get value of ParamName :" + ParamName);
+//                System.out.println("Get value of ParamName :" + ParamName);
 
             }
         }
@@ -116,11 +116,11 @@ public class PreUploadCheck extends ServiceLifecycle {
             EbCommonParamTmbTable ebCommonnParamTmbTble = new EbCommonParamTmbTable(this);
             EbCommonParamTmbRecord ebCommonParamTmbRecord = new EbCommonParamTmbRecord(
                     dataAccess.getRecord("EB.COMMON.PARAM.TMB", "AUTOMATIC.BILLING.FILE.NAME"));
-            System.out.println("EB.COMMON.PARAM.TMB START");
+//            System.out.println("EB.COMMON.PARAM.TMB START");
             updateCommonParamRecord(ebCommonParamTmbRecord, id);
             ebCommonnParamTmbTble.write("AUTOMATIC.BILLING.FILE.NAME", ebCommonParamTmbRecord);
 
-            System.out.println("Parameter update end");
+//            System.out.println("Parameter update end");
 
             // SynchronousTransactionData tdThree = new
             // SynchronousTransactionData();
@@ -140,10 +140,14 @@ public class PreUploadCheck extends ServiceLifecycle {
         // Veer End
 
         String filetoMove = PREUP_DIR + id;
+        System.out.println("filetoMove is " + filetoMove);
         Path sourceFile = Paths.get(filetoMove);
+        System.out.println("sourceFile is " + sourceFile);
         Path destinationFolder = Paths.get(LOAD_DIR);
+        System.out.println("destinationFolder is " + destinationFolder);
         String newFileName = "OBDX-AUTOMATEDBILLING.txt";
         Path destinationFile = destinationFolder.resolve(newFileName);
+        System.out.println("destinationFile is " + destinationFile);
 
         try {
             Files.move(sourceFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
@@ -158,7 +162,7 @@ public class PreUploadCheck extends ServiceLifecycle {
             verionOfs.setFunction("INPUT");
             verionOfs.setNumberOfAuthoriser("0");
             transactionData.add(verionOfs);
-            System.out.println("Transaciton Data---" + transactionData.toString());
+//            System.out.println("Transaciton Data---" + transactionData.toString());
         } catch (IOException var14) {
         }
 

@@ -245,8 +245,8 @@ public class computeCommission extends ServiceLifecycle {
 
             // Write to file if there’s a charge
             if (newChgAmt != 0.0) {
-                writeChargeToFile(id, newChgAmt, totalChgTxnAmt);
-                writeofsToFile(id, newChgAmt, cocode);
+                writeChargeToFile(id, newChgAmt, totalChgTxnAmt,CalendarLastDay);
+                writeofsToFile(id, newChgAmt, cocode,CalendarLastDay);
             }
 
             System.out.println("Charge Amount for ID " + id + ": " + newChgAmt);
@@ -257,9 +257,9 @@ public class computeCommission extends ServiceLifecycle {
     }
 
     // Writes charge details to a file
-    private void writeChargeToFile(String id, double chargeAmount, double totalChgTxnAmt) {
+    private void writeChargeToFile(String id, double chargeAmount, double totalChgTxnAmt,  String CalendarLastDay) {
         BigDecimal FtotalChgTxnAmt = new BigDecimal(totalChgTxnAmt);
-        String filePath = "/t24appl/t24prod/t24/bnk/UD/COM.OUT/202512ComMouvecharges_output.txt";
+        String filePath = "/t24appl/t24prod/t24/bnk/UD/COM.OUT/"+CalendarLastDay+"ComMouvecharges_output.txt";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write("ID: " + id + ", Charge: " + chargeAmount + ", TotalTxnAmt: " + FtotalChgTxnAmt);
             writer.newLine();
@@ -268,11 +268,11 @@ public class computeCommission extends ServiceLifecycle {
             e.printStackTrace();
         }
     }    
-    private void writeofsToFile(String id, double chargeAmount,String cocode) {
-        String filePath = "/t24appl/t24prod/t24/bnk/UD/COM.OUT/202512OFSComMouvcharges_output.txt";
+    private void writeofsToFile(String id, double chargeAmount,String cocode, String PeriodEnd) {
+        String filePath = "/t24appl/t24prod/t24/bnk/UD/COM.OUT/"+PeriodEnd+"OFSComMouvcharges_output.txt";
         String ofspost = "AC.CHARGE.REQUEST,INPUT/I/PROCESS//0,INPUTT/Password/"+cocode+",,REQUEST.TYPE=CHARGE,DEBIT.ACCOUNT="+id
-                +",CHARGE.CCY=XOF,CHARGE.DATE=20251231,CHARGE.CODE=COMMOUVE,CHARGE.AMOUNT="+chargeAmount
-                +",EXTRA.DETAILS=BBCICOMMOUVEDEC2025,STATUS=PAID,RELATED.REF=BBCICOMMOUVE";
+                +",CHARGE.CCY=XOF,CHARGE.DATE="+PeriodEnd+",CHARGE.CODE=COMMOUVE,CHARGE.AMOUNT="+chargeAmount
+                +",EXTRA.DETAILS=BBCICOMMOUVEDE"+PeriodEnd+",STATUS=PAID,RELATED.REF=BBCICOMMOUVE";
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             writer.write(ofspost);
             writer.newLine();
